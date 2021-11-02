@@ -15,15 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import get_token
+from core.auth.views import get_token
+from core.auth.admin.views import login
+from core.users.views import Web3UserList, Web3UserDetail, Web3UserCreate
+
 # from rest_framework_simplejwt.views import (
 #     TokenObtainPairView,
 #     TokenRefreshView,
 # )
-
+#TODO: serperate api/user/<pk:string> as body and into POST vs GET
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', get_token, name='get_token'),
-    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
+    path('api/users/', Web3UserList.as_view()),
+    path('api/user/<str:public_address>', Web3UserDetail.as_view()),
+    path('api/user/', Web3UserCreate.as_view()),
+    path('/login', login, name='login'),
 ]

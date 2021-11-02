@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
 
-from core.backends import Web3Backend
+from core.auth.backends import Web3Backend
 import json
 
 import logging
@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 #TODO: user django rest framework to create nad serialize the users
 
+#expects public_address, nonce and token if user is currently signed in
 @api_view(["POST"])
 def get_token(request):
     public_address =  request.data["public_address"]

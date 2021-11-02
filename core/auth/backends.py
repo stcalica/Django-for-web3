@@ -1,6 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from core.users.models import Web3User
 import datetime
 import jwt
 
@@ -10,7 +11,6 @@ SECRET_KEY = "secret"
 import logging
 logger = logging.getLogger(__name__)
 
-from core.models import Web3User
 
 class Web3Backend(ModelBackend):
     '''
