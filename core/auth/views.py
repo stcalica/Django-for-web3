@@ -21,7 +21,7 @@ def get_token(request):
     if token:
         return JsonResponse({'token': token})
     else:
-        return HttpResponse('Authentication Failed')
+        return Response({'message': 'Missing token'}, status=400)
 
 def submit_nft_request(request):
     pass

@@ -16,8 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from core.auth.views import get_token
-from core.auth.admin.views import login
-from core.users.views import Web3UserList, Web3UserDetail, Web3UserCreate
+from core.users.views import Web3UserList, Web3UserDetail
 
 # from rest_framework_simplejwt.views import (
 #     TokenObtainPairView,
@@ -29,6 +28,4 @@ urlpatterns = [
     path('api/token/', get_token, name='get_token'),
     path('api/users/', Web3UserList.as_view()),
     path('api/user/<str:public_address>', Web3UserDetail.as_view()),
-    path('api/user/', Web3UserCreate.as_view()),
-    path('/login', login, name='login'),
 ]

@@ -23,42 +23,23 @@ class Web3UserDetail(APIView):
     permission_classes = []
 
     def get(self, request, **kwargs):
-        logger.debug('attempting to get user')
-        logger.debug(request.data)
         public_address = kwargs.get('public_address', None)
-        logger.debug(public_address)
         if(public_address):
             try:
-                web3user = Web3User.objects.get(public_address=public_address)
-                serializer = Web3UserSerializer(web3user)
-            except Exception:
-                return Http404('User does not exist')
-            return JsonResponse(serializer.data)
-        return HttpResponseBadRequest('missing public address')
-
-class Web3UserCreate(APIView):
-    authentication_classes = []
-    permission_classes = []
-
-    def post(self, request):
-        public_address = request.data.get('public_address', None)
-        if(public_address):
-            try:
-                #TODO: missing nonce in serializer?
-                created = Web3User.objects.get_or_create(public_address=public_address, nonce=uuid.uuid4().hex)
+                user, created = Web3User.objects.get_or_create(public_address=public_address)
                 if(created):
                     try:
-                        web3user = Web3User.objects.get(public_address=public_address)
-                        serializer = Web3UserSerializer(web3user)
-                        logger.debug('user was created')
+                        serializer = Web3UserSerializer(user)
                         logger.debug(json.dumps(serializer.data))
                         return JsonResponse(serializer.data)
                     except Exception:
-                        return Http404('Something went wrong with creating user')
+                        return Response({"message": "something went wrong with creating user"}, status=404)
+                elif(user):
+                    serializer = Web3UserSerializer(user)
+                    return JsonResponse(serializer.data)
                 else:
-                    return HttpResponseBadRequest('something went wrong with creating')
-            except Exception:
-                return Http400('User was not created')
-
-        else:
-            return HttpResponseBadRequest('missing public address')
+                    return Response({"message": "something went wrong with creating user"}, status=400)
+            except Exception as e:
+                return Response({"message": "user not found nor created", "exception": str(e)}, status=404)
+            return JsonResponse(serializer.data)
+        return Response({"message": "no public_address"}, status=400)

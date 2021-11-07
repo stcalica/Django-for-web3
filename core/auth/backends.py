@@ -38,6 +38,7 @@ class Web3Backend(ModelBackend):
             #TODO: decode the JWT and check if the user is the proper user
             try:
                 #TODO: database check; will want to switch to JWT tokens in the future with refresh check to grab user
+                logger.debug('grabbing web3user to authenticate')
                 web3user = Web3User.objects.get(public_address=public_address)
                 #TODO: check nonce is signed correctly by user's private key by using the public key
                 if ( web3user and self._check_nonce(nonce)):
