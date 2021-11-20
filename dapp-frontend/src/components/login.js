@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../context/UserContext.js';
 
-const Login = () => {
+const LoginButton = () => {
   const { user, login } = useContext(UserContext);
 
   const authenticate = (e) => {
@@ -17,4 +17,4 @@ const Login = () => {
   );
 }
 
-export default Login;
+export default LoginButton;
