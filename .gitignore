@@ -1,3 +1,5 @@
 */__pycache__/*
+*core/users/__pycache__/*
 *core/migrations/*
+*core/auth/__pycache__/*
 db.sqlite3

@@ -5,11 +5,16 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { UserProvider } from './context/UserContext.js';
+
+
 ReactDOM.render(
   <React.StrictMode>
+  <UserProvider>
   <Router>
     <App />
     </Router>
+    </UserProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
