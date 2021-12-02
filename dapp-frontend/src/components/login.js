@@ -9,12 +9,20 @@ const LoginButton = () => {
 
   const authenticate = (e) => {
     e.preventDefault();
-    let token = login();
-    console.log('token called for');
-    console.dir(user);
-    if(token){
+    console.log(user);
+    if(user && user.hasOwnProperty('token') && user.token){
       navigate(state.path || "/");
     }
+    else{
+      let token = login();
+      console.log('token called for');
+      console.dir(user);
+      if(token){
+        console.log(user);
+        navigate(state.path || "/");
+      }
+    }
+
   };
 
   return (

@@ -9,7 +9,6 @@ const defaultValues = {
 
 export const UserContext = createContext(defaultValues);
 
-
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
@@ -21,11 +20,12 @@ export const UserProvider = ({ children }) => {
           console.log(`address: ${address}`);
           try {
               await window.ethereum.enable();
-              let user = await APIClient('user', 'GET', address);
+              let user = await APIClient('user', 'GET',  address);
               let nonce = user.nonce;
-              const singedNonce = await window.web3.eth.sign(nonce, address)
+              const nonceHash = window.web3.eth.accounts.hashMessage(nonce)
+              const singedNonce = await window.web3.eth.sign(nonceHash, address)
               console.log(singedNonce);
-              let token = await APIClient('token', 'POST', address, {'nonce': singedNonce});
+              let token = await APIClient('token', 'POST', address, {'nonce': singedNonce, 'public_address': address });
               console.log(token);
               setUser({...user, ...token});
               return token;
@@ -36,7 +36,6 @@ export const UserProvider = ({ children }) => {
         console.log('please install a crypto wallet');
       }
     };
-
 
   return(
     <UserContext.Provider value={{

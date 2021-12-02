@@ -3,6 +3,7 @@ import { UserContext } from '../context/UserContext.js';
 
 const Home = () => {
   const { user } = useContext(UserContext);
+  console.dir(user);
   return (
     <h2> Welcome to Moneyshot </h2>
   );

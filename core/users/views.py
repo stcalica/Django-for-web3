@@ -8,6 +8,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
 
+from core.auth.backends import Web3Backend
+
 import uuid, json
 
 import logging
@@ -28,6 +30,7 @@ class Web3UserDetail(APIView):
             try:
                 user, created = Web3User.objects.get_or_create(public_address=public_address)
                 if(created):
+                    logger.debug('created new user')
                     try:
                         serializer = Web3UserSerializer(user)
                         logger.debug(json.dumps(serializer.data))
@@ -41,5 +44,20 @@ class Web3UserDetail(APIView):
                     return Response({"message": "something went wrong with creating user"}, status=400)
             except Exception as e:
                 return Response({"message": "user not found nor created", "exception": str(e)}, status=404)
+            logger.debug('found user')
             return JsonResponse(serializer.data)
         return Response({"message": "no public_address"}, status=400)
+
+
+class Web3UserToken(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request, **kwargs):
+        public_address =  request.data["public_address"]
+        web3 = Web3Backend()
+        user, token = web3.authenticate(request)
+        if token:
+            return JsonResponse({'token': token})
+        else:
+            return Response({'message': 'Missing token'}, status=400)

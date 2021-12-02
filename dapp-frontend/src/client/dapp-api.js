@@ -16,9 +16,7 @@ const APIClient = async function callAPI(endpoint, method, address, data){
   if(data){
     headers = {
       ...headers,
-      body: JSON.stringify({
-        'public_address': address
-      }),
+      body: JSON.stringify(data),
     }
   } else {
     headers = {
@@ -30,6 +28,7 @@ const APIClient = async function callAPI(endpoint, method, address, data){
   }
 
   try {
+    console.log(`calling ${URL}`);
     return await fetch(URL, headers).then(response => response.json());
   } catch(err) {
     console.error(err);
