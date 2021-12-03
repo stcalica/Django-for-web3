@@ -4,6 +4,7 @@ import APIClient from '../client/dapp-api';
 
 const defaultValues = {
   user : null,
+  authenticated: false,
   login: () => {},
 };
 
@@ -11,9 +12,9 @@ export const UserContext = createContext(defaultValues);
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [authenticated, isAuthenticated] = useState(false);
 
   const login = async () => {
-    console.log('login called');
       if (window.ethereum) {
           window.web3 = new Web3(window.ethereum);
           let address = window.web3.currentProvider.selectedAddress;
@@ -28,6 +29,7 @@ export const UserProvider = ({ children }) => {
               let token = await APIClient('token', 'POST', address, {'nonce': singedNonce, 'public_address': address });
               console.log(token);
               setUser({...user, ...token});
+              isAuthenticated(true);
               return token;
           } catch (error) {
               console.log(error);
@@ -40,6 +42,7 @@ export const UserProvider = ({ children }) => {
   return(
     <UserContext.Provider value={{
       ...defaultValues,
+      authenticated,
       user,
       login,
     }}>

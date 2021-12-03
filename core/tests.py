@@ -1,5 +1,6 @@
 from rest_framework.test import APIClient
 from django.test import TestCase
+from unittest.mock import MagicMock
 
 from core.users.models import Web3UserManager
 
