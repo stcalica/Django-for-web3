@@ -7,6 +7,9 @@ from rest_framework.exceptions import AuthenticationFailed, NotFound
 from rest_framework.response import Response
 from core.users.models import Web3User
 from web3.auto import w3
+
+from .exceptions import UserNotFound, NonceSignatureNotCorrect, MissingParameter
+
 import uuid
 import datetime
 import jwt
@@ -43,17 +46,13 @@ class Web3Backend(ModelBackend):
                 #TODO: convert into datetime and make sure the current datetime is not pass this
                 expiry = datetime. strptime(token['expiry'],'%y-%m-%d')
                 now = datetime.date.today()
-                logger.debug(expiry)
-                logger.debug(now)
                 if(token['user'] == public_address and expiry < now):
-                    logger.debug('JWT still valid')
                     return True, curr_token
                 else:
                     return AuthenticationFailed()
             #TODO: decode the JWT and check if the user is the proper user
             try:
                 #TODO: database check; will want to switch to JWT tokens in the future with refresh check to grab user
-                logger.debug('grabbing web3user to authenticate')
                 web3user = Web3User.objects.get(public_address=public_address)
                 #TODO: check nonce is signed correctly by user's private key by using the public key
                 if (web3user and self._check_nonce(web3user, nonce)):
@@ -64,32 +63,31 @@ class Web3Backend(ModelBackend):
                         web3user.nonce = uuid.uuid4().hex
                         web3user.save()
                     except Ex:
-                        logger.debug(Ex)
-                        return NotFound()
+                        #TODO: raise custom exceptions
+                        raise UserNotFound
                     return web3user, token
                 else:
+                    #TODO: move this outside to view duh!
                     Response({'message': 'nonce not correct'}, status=401)
             except Web3User.DoesNotExist:
                 #TODO: return an exception response
-                logger.debug('user not found')
-                return Web3User.DoesNotExist
+                raise UserNotFound
+                return None, None
         else:
             #TODO: return a 204 to signify a user does not exist and have the frontend to send a POST /user request
-            logger.debug('no nonce or public_address')
+            raise MissingParameter
             return None, None
 
     def get_user(self, user_id):
         try:
             return Web3User.objects.get(pk=user_id)
         except Web3User.DoesNotExist:
-            return None
+            raise UserNotFound
+            return None, None
 
     def _check_nonce(self, web3user, signed_nonce):
         message = encode_defunct(text=web3user.nonce)
         signer = Account.recover_message(message, signature=signed_nonce)
-        logger.debug(str(signer).lower())
-        logger.debug(str(web3user.public_address).lower())
-        logger.debug(str(signer).lower() == str(web3user.public_address).lower())
         return str(signer).lower() == str(web3user.public_address).lower()
 
 #https://stackoverflow.com/questions/62739175/implement-djangorestframework-simplejwt-token-authentication-without-password
