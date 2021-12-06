@@ -41,15 +41,13 @@ class Web3Backend(ModelBackend):
         if public_address:
             if curr_token:
                 #TODO: decode token and check if public_address is the same as the user calling it and if not expired
-                    #TODO: if yes then just return true and token
                 token =jwt.decode(curr_token, SECRET_KEY, algorithms="HS256")
-                #TODO: convert into datetime and make sure the current datetime is not pass this
-                expiry = datetime. strptime(token['expiry'],'%y-%m-%d')
+                expiry = datetime.strptime(token['expiry'],'%y-%m-%d')
                 now = datetime.date.today()
                 if(token['user'] == public_address and expiry < now):
                     return True, curr_token
                 else:
-                    return AuthenticationFailed()
+                    raise AuthenticationFailed()
             #TODO: decode the JWT and check if the user is the proper user
             try:
                 #TODO: database check; will want to switch to JWT tokens in the future with refresh check to grab user
@@ -63,20 +61,18 @@ class Web3Backend(ModelBackend):
                         web3user.nonce = uuid.uuid4().hex
                         web3user.save()
                     except Ex:
-                        #TODO: raise custom exceptions
-                        raise UserNotFound
+                        raise AuthenticationFailed()
                     return web3user, token
                 else:
                     #TODO: move this outside to view duh!
-                    Response({'message': 'nonce not correct'}, status=401)
+                    #Response({'message': 'nonce not correct'}, status=401)
+                    raise AuthenticationFailed()
             except Web3User.DoesNotExist:
                 #TODO: return an exception response
                 raise UserNotFound
-                return None, None
         else:
             #TODO: return a 204 to signify a user does not exist and have the frontend to send a POST /user request
             raise MissingParameter
-            return None, None
 
     def get_user(self, user_id):
         try:

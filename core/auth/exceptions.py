@@ -9,7 +9,6 @@ class UserNotFound(Exception):
     def __str__(self):
         return self.message
 
-
 class NonceSignatureNotCorrect(Exception):
     """
         Exception raised nonce is not correct.
@@ -21,8 +20,6 @@ class NonceSignatureNotCorrect(Exception):
 
     def __str__(self):
         return self.message
-
-
 
 class MissingParameter(Exception):
     """
